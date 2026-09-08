@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans:
+    Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, Cantarell,
+    'Helvetica Neue', sans-serif;
+  --font-mono: 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --color-surface-0: #0b0f14;
+  --color-surface-1: #10161d;
+  --color-surface-2: #161d26;
+  --color-surface-3: #1e2733;
+  --color-surface-border: #26313d;
+
+  --color-accent: #3ba3ff;
+  --color-accent-soft: #1a3350;
+
+  --color-success: #33c17a;
+  --color-warning: #e0a83b;
+  --color-danger: #e0554b;
+  --color-info: #3ba3ff;
+
+  --color-text-primary: rgba(240, 245, 250, 0.94);
+  --color-text-secondary: rgba(200, 212, 224, 0.68);
+  --color-text-muted: rgba(170, 184, 198, 0.45);
+}
+
+:root[data-theme='light'] {
+  --color-surface-0: #f4f6f8;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #ffffff;
+  --color-surface-3: #eef1f4;
+  --color-surface-border: #dde3e9;
+  --color-text-primary: rgba(20, 26, 32, 0.94);
+  --color-text-secondary: rgba(40, 50, 60, 0.68);
+  --color-text-muted: rgba(60, 70, 80, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-surface-0);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-border);
+  background-clip: padding-box;
+}
+
+code,
+.mono {
+  font-family: var(--font-mono);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 180ms ease-out;
+}

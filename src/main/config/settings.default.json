@@ -1,0 +1,8 @@
+{
+  "appName": "ClatuaTech Tools",
+  "theme": "dark",
+  "technicalMode": false,
+  "autoStart": false,
+  "uacBehavior": "always-ask",
+  "logRetentionDays": 30
+}

@@ -1,0 +1,11 @@
+[
+  { "vendor": "NVIDIA", "url": "https://www.nvidia.com/Download/index.aspx" },
+  { "vendor": "AMD", "url": "https://www.amd.com/en/support" },
+  { "vendor": "Intel", "url": "https://www.intel.com/content/www/us/en/support/detect.html" },
+  { "vendor": "Realtek", "url": "https://www.realtek.com/en/downloads" },
+  { "vendor": "Dell", "url": "https://www.dell.com/support/home" },
+  { "vendor": "HP", "url": "https://support.hp.com/us-en/drivers" },
+  { "vendor": "Lenovo", "url": "https://support.lenovo.com/us/en/drivers-and-software" },
+  { "vendor": "ASUS", "url": "https://www.asus.com/support/" },
+  { "vendor": "Acer", "url": "https://www.acer.com/us-en/support/drivers-and-manuals" }
+]

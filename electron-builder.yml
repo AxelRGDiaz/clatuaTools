@@ -1,0 +1,31 @@
+appId: com.clatuatech.tools
+productName: ClatuaTech Tools
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+asarUnpack:
+  - resources/**
+win:
+  executableName: ClatuaTech-Tools
+  target:
+    - target: nsis
+      arch:
+        - x64
+# The app starts as a normal user and offers an explicit "Reiniciar como
+# administrador" button (UAC prompt) only for actions that need it — it
+# must NOT auto-elevate on every launch, so this stays asInvoker.
+requestedExecutionLevel: asInvoker
+nsis:
+  artifactName: ${name}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+npmRebuild: false

@@ -1,0 +1,152 @@
+[
+  {
+    "id": "chrome",
+    "name": "Google Chrome",
+    "category": "browsers",
+    "wingetId": "Google.Chrome",
+    "description": "Navegador web de Google.",
+    "quickInstall": true
+  },
+  {
+    "id": "firefox",
+    "name": "Mozilla Firefox",
+    "category": "browsers",
+    "wingetId": "Mozilla.Firefox",
+    "description": "Navegador web de Mozilla.",
+    "quickInstall": true
+  },
+  {
+    "id": "edge",
+    "name": "Microsoft Edge",
+    "category": "browsers",
+    "wingetId": "Microsoft.Edge",
+    "description": "Navegador web de Microsoft (normalmente ya viene instalado)."
+  },
+  {
+    "id": "brave",
+    "name": "Brave",
+    "category": "browsers",
+    "wingetId": "Brave.Brave",
+    "description": "Navegador web centrado en privacidad."
+  },
+  {
+    "id": "7zip",
+    "name": "7-Zip",
+    "category": "utilities",
+    "wingetId": "7zip.7zip",
+    "description": "Compresor y descompresor de archivos.",
+    "quickInstall": true
+  },
+  {
+    "id": "vlc",
+    "name": "VLC",
+    "category": "multimedia",
+    "wingetId": "VideoLAN.VLC",
+    "description": "Reproductor multimedia universal.",
+    "quickInstall": true
+  },
+  {
+    "id": "everything",
+    "name": "Everything",
+    "category": "utilities",
+    "wingetId": "voidtools.Everything",
+    "description": "Buscador de archivos instantáneo."
+  },
+  {
+    "id": "notepadpp",
+    "name": "Notepad++",
+    "category": "utilities",
+    "wingetId": "Notepad++.Notepad++",
+    "description": "Editor de texto avanzado."
+  },
+  {
+    "id": "powertoys",
+    "name": "PowerToys",
+    "category": "utilities",
+    "wingetId": "Microsoft.PowerToys",
+    "description": "Utilidades avanzadas de Microsoft para Windows.",
+    "quickInstall": true
+  },
+  {
+    "id": "vscode",
+    "name": "Visual Studio Code",
+    "category": "development",
+    "wingetId": "Microsoft.VisualStudioCode",
+    "description": "Editor de código de Microsoft.",
+    "quickInstall": true
+  },
+  {
+    "id": "git",
+    "name": "Git",
+    "category": "development",
+    "wingetId": "Git.Git",
+    "description": "Sistema de control de versiones.",
+    "quickInstall": true
+  },
+  {
+    "id": "nodejs",
+    "name": "Node.js",
+    "category": "development",
+    "wingetId": "OpenJS.NodeJS.LTS",
+    "description": "Entorno de ejecución de JavaScript.",
+    "quickInstall": true
+  },
+  {
+    "id": "python",
+    "name": "Python",
+    "category": "development",
+    "wingetId": "Python.Python.3.12",
+    "description": "Lenguaje de programación Python.",
+    "quickInstall": true
+  },
+  {
+    "id": "java",
+    "name": "Java (Temurin JDK)",
+    "category": "development",
+    "wingetId": "EclipseAdoptium.Temurin.17.JDK",
+    "description": "Kit de desarrollo de Java (Eclipse Temurin).",
+    "quickInstall": true
+  },
+  {
+    "id": "docker",
+    "name": "Docker Desktop",
+    "category": "development",
+    "wingetId": "Docker.DockerDesktop",
+    "description": "Plataforma de contenedores Docker."
+  },
+  {
+    "id": "discord",
+    "name": "Discord",
+    "category": "communication",
+    "wingetId": "Discord.Discord",
+    "description": "Aplicación de chat de voz y texto."
+  },
+  {
+    "id": "telegram",
+    "name": "Telegram",
+    "category": "communication",
+    "wingetId": "Telegram.TelegramDesktop",
+    "description": "Aplicación de mensajería."
+  },
+  {
+    "id": "zoom",
+    "name": "Zoom",
+    "category": "communication",
+    "wingetId": "Zoom.Zoom",
+    "description": "Videoconferencias."
+  },
+  {
+    "id": "obs",
+    "name": "OBS Studio",
+    "category": "multimedia",
+    "wingetId": "OBSProject.OBSStudio",
+    "description": "Grabación y streaming de video."
+  },
+  {
+    "id": "handbrake",
+    "name": "HandBrake",
+    "category": "multimedia",
+    "wingetId": "HandBrake.HandBrake",
+    "description": "Conversor de video."
+  }
+]
