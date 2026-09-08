@@ -17,7 +17,11 @@ function createWindow(): BrowserWindow {
     show: false,
     autoHideMenuBar: true,
     backgroundColor: '#0b0f14',
-    ...(process.platform === 'linux' ? { icon } : {}),
+    // Packaged Windows builds get their icon embedded by electron-builder
+    // from build/icon.ico automatically, but `npm run dev`/`preview` never
+    // go through that step, so without this the taskbar/window would show
+    // Electron's default icon during development on every platform.
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,

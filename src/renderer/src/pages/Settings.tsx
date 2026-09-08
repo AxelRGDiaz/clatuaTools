@@ -25,7 +25,7 @@ function Toggle({
         className={`relative h-6 w-11 shrink-0 rounded-full transition-colors cursor-pointer ${checked ? 'bg-(--color-accent)' : 'bg-(--color-surface-3)'}`}
       >
         <span
-          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`}
+          className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`}
         />
       </button>
     </div>
