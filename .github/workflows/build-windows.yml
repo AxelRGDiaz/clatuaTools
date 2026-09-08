@@ -34,6 +34,11 @@ jobs:
         run: npm run typecheck
 
       - name: Build Windows installer
+        # No tenemos certificado de firma de código. Sin esta variable,
+        # electron-builder puede intentar usar el signtool.exe real del
+        # runner y fallar buscando un certificado inexistente.
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
         run: npm run build:win
 
       - name: Upload installer artifact
