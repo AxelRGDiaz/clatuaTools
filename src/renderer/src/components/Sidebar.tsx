@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { cn } from '../lib/cn'
 import { useNavStore, type PageId } from '../store/navStore'
+import logo from '../assets/logo.png'
 
 interface NavItem {
   id: PageId
@@ -44,9 +45,7 @@ export function Sidebar(): React.JSX.Element {
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-(--color-surface-border) bg-(--color-surface-1)">
       <div className="flex items-center gap-2 border-b border-(--color-surface-border) px-4 py-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--color-accent) text-sm font-bold text-white">
-          CT
-        </div>
+        <img src={logo} alt="ClatuaTech Tools" className="h-8 w-8 rounded-lg" />
         <div>
           <p className="text-sm font-semibold leading-none text-(--color-text-primary)">
             ClatuaTech

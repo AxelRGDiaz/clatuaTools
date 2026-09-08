@@ -1,9 +1,22 @@
 import { useEffect } from 'react'
-import { ShieldAlert, ShieldCheck, Terminal } from 'lucide-react'
+import { ShieldAlert, ShieldCheck, Terminal, ScrollText } from 'lucide-react'
 import { useNavStore, type PageId } from '../store/navStore'
 import { useAdminStore } from '../store/adminStore'
 import { useSettingsStore } from '../store/settingsStore'
-import { Button } from './Button'
+import { cn } from '../lib/cn'
+
+// Every chip in the header row shares this exact shape/size — only the
+// color tokens change with state. Mixing a pill shape for some states and
+// a different shape (e.g. the generic Button's rounded-lg) for others is
+// what made the row look uneven depending on whether something was on/off.
+const PILL =
+  'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer'
+const PILL_ON = 'border-(--color-accent)/40 bg-(--color-accent-soft) text-(--color-accent)'
+const PILL_OFF =
+  'border-(--color-surface-border) bg-transparent text-(--color-text-secondary) hover:bg-(--color-surface-2)'
+const PILL_SUCCESS = 'border-(--color-success)/30 bg-(--color-success)/10 text-(--color-success)'
+const PILL_WARNING =
+  'border-(--color-warning)/30 bg-(--color-warning)/10 text-(--color-warning) hover:bg-(--color-warning)/20'
 
 const PAGE_TITLES: Record<PageId, string> = {
   home: 'Inicio',
@@ -22,6 +35,7 @@ const PAGE_TITLES: Record<PageId, string> = {
 
 export function TopBar(): React.JSX.Element {
   const activePage = useNavStore((s) => s.activePage)
+  const logPanelOpen = useNavStore((s) => s.logPanelOpen)
   const toggleLogPanel = useNavStore((s) => s.toggleLogPanel)
   const { isElevated, checked, refresh, relaunchAsAdmin } = useAdminStore()
   const settings = useSettingsStore((s) => s.settings)
@@ -40,7 +54,7 @@ export function TopBar(): React.JSX.Element {
       <div className="flex items-center gap-2">
         <button
           onClick={() => updateSettings({ technicalMode: !settings?.technicalMode })}
-          className="flex items-center gap-1.5 rounded-full border border-(--color-surface-border) px-3 py-1 text-xs text-(--color-text-secondary) hover:bg-(--color-surface-2) cursor-pointer"
+          className={cn(PILL, settings?.technicalMode ? PILL_ON : PILL_OFF)}
           title="Alternar modo técnico"
         >
           <Terminal size={13} />
@@ -49,27 +63,25 @@ export function TopBar(): React.JSX.Element {
 
         <button
           onClick={toggleLogPanel}
-          className="rounded-full border border-(--color-surface-border) px-3 py-1 text-xs text-(--color-text-secondary) hover:bg-(--color-surface-2) cursor-pointer"
+          className={cn(PILL, logPanelOpen ? PILL_ON : PILL_OFF)}
+          title="Mostrar u ocultar el panel de registro"
         >
+          <ScrollText size={13} />
           Registro
         </button>
 
         {checked && (
           <>
             {isElevated ? (
-              <span className="flex items-center gap-1.5 rounded-full border border-(--color-success)/30 bg-(--color-success)/10 px-3 py-1 text-xs font-medium text-(--color-success)">
+              <span className={cn(PILL, PILL_SUCCESS, 'cursor-default')}>
                 <ShieldCheck size={13} />
                 Administrador
               </span>
             ) : (
-              <Button
-                variant="secondary"
-                className="!py-1 !px-3 text-xs"
-                icon={<ShieldAlert size={13} />}
-                onClick={relaunchAsAdmin}
-              >
+              <button onClick={relaunchAsAdmin} className={cn(PILL, PILL_WARNING)}>
+                <ShieldAlert size={13} />
                 Reiniciar como administrador
-              </Button>
+              </button>
             )}
           </>
         )}
