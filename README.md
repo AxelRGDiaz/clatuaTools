@@ -104,6 +104,23 @@ Windows (wine + mono en Linux/macOS); en este repositorio se ha verificado el `b
 TypeScript/Vite (`npm run build`) mientras que el empaquetado final `.exe` requiere un host o
 runner de Windows para producir el binario firmado/instalable.
 
+### Generar el `.exe` con GitHub Actions
+
+El repositorio incluye `.github/workflows/build-windows.yml`, que compila el instalador en un
+runner `windows-latest` (sin necesitar Windows en local):
+
+- **En cada push a `main`** y en cada PR: instala dependencias, ejecuta `lint` + `typecheck` +
+  `build:win`, y sube el `.exe` resultante como artefacto descargable de la ejecución del workflow
+  (pestaña *Actions* → la ejecución → *Artifacts*).
+- **Al hacer push de un tag `vX.Y.Z`** (por ejemplo `git tag v1.0.0 && git push origin v1.0.0`):
+  además de lo anterior, crea automáticamente una GitHub Release con el `.exe` adjunto.
+- También se puede lanzar manualmente desde *Actions → Build Windows installer → Run workflow*.
+
+El instalador generado no está firmado digitalmente, así que Windows SmartScreen puede mostrar una
+advertencia la primera vez que se ejecute en un equipo — es el comportamiento esperado sin un
+certificado de firma de código; añadirlo (`CSC_LINK`/`CSC_KEY_PASSWORD` como secrets del repo) queda
+como mejora futura si se necesita distribuir sin esa advertencia.
+
 ## Ampliar el catálogo
 
 - **Programas instalables:** edita `src/main/config/apps.json`. Cada entrada necesita un `id`
