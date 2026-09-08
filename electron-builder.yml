@@ -17,10 +17,10 @@ win:
     - target: nsis
       arch:
         - x64
-# The app starts as a normal user and offers an explicit "Reiniciar como
-# administrador" button (UAC prompt) only for actions that need it — it
-# must NOT auto-elevate on every launch, so this stays asInvoker.
-requestedExecutionLevel: asInvoker
+  # The app starts as a normal user and offers an explicit "Reiniciar como
+  # administrador" button (UAC prompt) only for actions that need it — it
+  # must NOT auto-elevate on every launch, so this stays asInvoker.
+  requestedExecutionLevel: asInvoker
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
