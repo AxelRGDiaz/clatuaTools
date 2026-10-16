@@ -15,6 +15,7 @@ import type {
   MaintenanceAction,
   OfficeInstallChoice,
   QuickToolId,
+  ReportExportPayload,
   WindowsRepairAction
 } from '../shared/types'
 
@@ -83,6 +84,10 @@ const api = {
   settings: {
     get: () => ipcRenderer.invoke(IpcChannels.settingsGet),
     set: (partial: Partial<AppSettings>) => ipcRenderer.invoke(IpcChannels.settingsSet, partial)
+  },
+  report: {
+    exportPdf: (payload: ReportExportPayload) =>
+      ipcRenderer.invoke(IpcChannels.reportExportPdf, payload)
   }
 }
 

@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
-import { ShieldAlert, ShieldCheck, Terminal, ScrollText } from 'lucide-react'
-import { useNavStore, type PageId } from '../store/navStore'
+import { ShieldAlert, ShieldCheck, Terminal, ScrollText, ListChecks } from 'lucide-react'
+import { useNavStore } from '../store/navStore'
 import { useAdminStore } from '../store/adminStore'
 import { useSettingsStore } from '../store/settingsStore'
+import { useTaskStore, runningTaskCount } from '../store/taskStore'
+import { PAGE_TITLES } from '../lib/pages'
 import { cn } from '../lib/cn'
 
 // Every chip in the header row shares this exact shape/size — only the
@@ -18,21 +20,6 @@ const PILL_SUCCESS = 'border-(--color-success)/30 bg-(--color-success)/10 text-(
 const PILL_WARNING =
   'border-(--color-warning)/30 bg-(--color-warning)/10 text-(--color-warning) hover:bg-(--color-warning)/20'
 
-const PAGE_TITLES: Record<PageId, string> = {
-  home: 'Inicio',
-  programs: 'Programas',
-  'quick-install': 'Instalación rápida',
-  windows: 'Windows',
-  office: 'Office',
-  activation: 'Licencia y activación',
-  drivers: 'Drivers',
-  diagnostics: 'Diagnóstico',
-  maintenance: 'Mantenimiento',
-  network: 'Red',
-  tools: 'Herramientas',
-  settings: 'Configuración'
-}
-
 export function TopBar(): React.JSX.Element {
   const activePage = useNavStore((s) => s.activePage)
   const logPanelOpen = useNavStore((s) => s.logPanelOpen)
@@ -40,6 +27,10 @@ export function TopBar(): React.JSX.Element {
   const { isElevated, checked, refresh, relaunchAsAdmin } = useAdminStore()
   const settings = useSettingsStore((s) => s.settings)
   const updateSettings = useSettingsStore((s) => s.update)
+  const tasks = useTaskStore((s) => s.tasks)
+  const taskCenterOpen = useTaskStore((s) => s.open)
+  const toggleTaskCenter = useTaskStore((s) => s.toggle)
+  const activeTasks = runningTaskCount(tasks)
 
   useEffect(() => {
     refresh()
@@ -59,6 +50,20 @@ export function TopBar(): React.JSX.Element {
         >
           <Terminal size={13} />
           Modo técnico {settings?.technicalMode ? 'activado' : 'desactivado'}
+        </button>
+
+        <button
+          onClick={toggleTaskCenter}
+          className={cn(PILL, taskCenterOpen || activeTasks > 0 ? PILL_ON : PILL_OFF)}
+          title="Abrir el centro de tareas"
+        >
+          <ListChecks size={13} />
+          Tareas
+          {activeTasks > 0 && (
+            <span className="rounded-full bg-(--color-accent) px-1.5 text-[10px] font-bold text-white">
+              {activeTasks}
+            </span>
+          )}
         </button>
 
         <button

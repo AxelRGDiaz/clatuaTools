@@ -16,7 +16,7 @@ function createWindow(): BrowserWindow {
     minHeight: 680,
     show: false,
     autoHideMenuBar: true,
-    backgroundColor: '#0b0f14',
+    backgroundColor: '#0a0e13',
     // Packaged Windows builds get their icon embedded by electron-builder
     // from build/icon.ico automatically, but `npm run dev`/`preview` never
     // go through that step, so without this the taskbar/window would show

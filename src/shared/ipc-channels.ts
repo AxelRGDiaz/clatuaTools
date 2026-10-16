@@ -16,6 +16,8 @@ import type {
   OfficeInstallChoice,
   OfficeStatus,
   QuickToolId,
+  ReportExportPayload,
+  ReportExportResult,
   SystemSnapshot,
   VendorLink,
   WindowsRepairAction,
@@ -68,7 +70,10 @@ export const IpcChannels = {
 
   // settings
   settingsGet: 'settings:get',
-  settingsSet: 'settings:set'
+  settingsSet: 'settings:set',
+
+  // report
+  reportExportPdf: 'report:exportPdf'
 } as const
 
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels]
@@ -119,4 +124,9 @@ export interface IpcApi {
 
   [IpcChannels.settingsGet]: { args: []; result: AppSettings }
   [IpcChannels.settingsSet]: { args: [settings: Partial<AppSettings>]; result: AppSettings }
+
+  [IpcChannels.reportExportPdf]: {
+    args: [payload: ReportExportPayload]
+    result: ReportExportResult
+  }
 }

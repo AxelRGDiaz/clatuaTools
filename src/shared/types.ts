@@ -152,6 +152,7 @@ export type QuickToolId =
   | 'system-restore'
   | 'environment-variables'
   | 'storage-sense'
+  | 'system-activation'
 
 export type MaintenanceAction =
   | 'clean-temp-user'
@@ -159,6 +160,7 @@ export type MaintenanceAction =
   | 'clean-explorer-cache'
   | 'restart-explorer'
   | 'open-startup-apps'
+  | 'system_tools'
 
 export interface MaintenanceActionResult {
   action: MaintenanceAction
@@ -234,6 +236,25 @@ export interface AppSettings {
   autoStart: boolean
   uacBehavior: 'always-ask' | 'silent-when-possible'
   logRetentionDays: number
+}
+
+// ---------------------------------------------------------------------------
+// Informe de entrega (PDF)
+// ---------------------------------------------------------------------------
+
+// El renderer arma el HTML del informe (donde viven los estilos) y el main
+// process sólo lo imprime a PDF y lo guarda. Así el formato del documento no
+// se duplica en el proceso principal.
+export interface ReportExportPayload {
+  html: string
+  defaultFileName: string
+}
+
+export interface ReportExportResult {
+  ok: boolean
+  path?: string
+  canceled?: boolean
+  error?: string
 }
 
 // ---------------------------------------------------------------------------

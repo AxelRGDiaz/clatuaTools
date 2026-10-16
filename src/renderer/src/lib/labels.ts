@@ -52,7 +52,8 @@ export const QUICK_TOOL_LABELS: Record<QuickToolId, string> = {
   firewall: 'Firewall',
   'system-restore': 'Restaurar sistema',
   'environment-variables': 'Variables de entorno',
-  'storage-sense': 'Storage Sense'
+  'storage-sense': 'Storage Sense',
+  'system-activation': 'Herramientas de Sistema'
 }
 
 export const MAINTENANCE_LABELS: Record<MaintenanceAction, { title: string; description: string }> =
@@ -78,5 +79,9 @@ export const MAINTENANCE_LABELS: Record<MaintenanceAction, { title: string; desc
     'open-startup-apps': {
       title: 'Aplicaciones de inicio',
       description: 'Abre el Administrador de tareas en la pestaña de aplicaciones de inicio.'
+    },
+    system_tools: {
+      title: 'Herramientas de sistema',
+      description: 'Pendiente de implementar.'
     }
   }

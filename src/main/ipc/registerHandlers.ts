@@ -8,6 +8,7 @@ import { registerActivationHandlers } from './handlers/activation'
 import { registerDriversHandlers } from './handlers/drivers'
 import { registerLogsHandlers } from './handlers/logs'
 import { registerSettingsHandlers } from './handlers/settings'
+import { registerReportHandlers } from './handlers/report'
 
 export function registerAllIpcHandlers(): void {
   registerSystemHandlers()
@@ -20,4 +21,5 @@ export function registerAllIpcHandlers(): void {
   registerDriversHandlers()
   registerLogsHandlers()
   registerSettingsHandlers()
+  registerReportHandlers()
 }

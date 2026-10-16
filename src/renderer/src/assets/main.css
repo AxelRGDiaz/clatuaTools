@@ -1,39 +1,54 @@
 @import 'tailwindcss';
 
 @theme {
+  /* ClatuaTech Tools 2.0 — fuentes del sistema de diseño. Se usan si están
+     instaladas en el equipo; si no, caen a Segoe UI (Windows) sin pedir red,
+     para que la app funcione siempre offline. */
   --font-sans:
-    Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, Cantarell,
+    'IBM Plex Sans', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, Roboto,
     'Helvetica Neue', sans-serif;
-  --font-mono: 'Cascadia Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  --font-mono: 'JetBrains Mono', 'Cascadia Mono', 'SF Mono', Consolas, 'Liberation Mono', monospace;
 
-  --color-surface-0: #0b0f14;
+  /* Tokens de color del rediseño 2.0 (tema oscuro). */
+  --color-surface-0: #0a0e13;
   --color-surface-1: #10161d;
-  --color-surface-2: #161d26;
-  --color-surface-3: #1e2733;
-  --color-surface-border: #26313d;
+  --color-surface-2: #161e27;
+  --color-surface-3: #1f2933;
+  --color-surface-border: #243040;
 
   --color-accent: #3ba3ff;
-  --color-accent-soft: #1a3350;
+  --color-accent-text: #7cc3ff;
+  --color-accent-soft: rgba(59, 163, 255, 0.14);
 
-  --color-success: #33c17a;
-  --color-warning: #e0a83b;
-  --color-danger: #e0554b;
+  --color-success: #35c57f;
+  --color-warning: #f0ad3c;
+  --color-danger: #f0605a;
   --color-info: #3ba3ff;
 
-  --color-text-primary: rgba(240, 245, 250, 0.94);
-  --color-text-secondary: rgba(200, 212, 224, 0.68);
-  --color-text-muted: rgba(170, 184, 198, 0.45);
+  --color-text-primary: #eef3f8;
+  --color-text-secondary: #a7b4c2;
+  --color-text-muted: #8a98a7;
 }
 
 :root[data-theme='light'] {
-  --color-surface-0: #f4f6f8;
+  --color-surface-0: #f3f5f8;
   --color-surface-1: #ffffff;
   --color-surface-2: #ffffff;
-  --color-surface-3: #eef1f4;
-  --color-surface-border: #dde3e9;
-  --color-text-primary: rgba(20, 26, 32, 0.94);
-  --color-text-secondary: rgba(40, 50, 60, 0.68);
-  --color-text-muted: rgba(60, 70, 80, 0.45);
+  --color-surface-3: #eef1f5;
+  --color-surface-border: #dce2e9;
+
+  --color-accent: #1e88e5;
+  --color-accent-text: #1565c0;
+  --color-accent-soft: rgba(30, 136, 229, 0.12);
+
+  --color-success: #1e8e5a;
+  --color-warning: #9a6400;
+  --color-danger: #b8302a;
+  --color-info: #1565c0;
+
+  --color-text-primary: #141a20;
+  --color-text-secondary: #3d4a58;
+  --color-text-muted: #5a6776;
 }
 
 * {

