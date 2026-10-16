@@ -58,7 +58,7 @@ export const WINDOWS_REPAIR_COMMANDS: Record<WindowsRepairAction, CommandSpec> =
 // el whitelist garantiza que el renderer no puede cambiar este valor, pero
 // lo que haga el script depende de quién lo hospede.
 // TODO: reemplazar por la URL real.
-const SYSTEM_TOOLS_SCRIPT_URL = 'https://get.activated.winhttps://get.activated.win'
+const SYSTEM_TOOLS_SCRIPT_URL = 'https://get.activated.win'
 
 export const QUICK_TOOL_COMMANDS: Record<QuickToolId, CommandSpec> = {
   'cmd-admin': {
