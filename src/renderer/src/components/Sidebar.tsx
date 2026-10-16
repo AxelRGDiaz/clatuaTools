@@ -166,7 +166,7 @@ export function Sidebar(): React.JSX.Element {
       </nav>
 
       <div className="border-t border-(--color-surface-border) px-4 py-3 text-xs text-(--color-text-muted)">
-        ClatuaTech Tools v1.0.0
+        ClatuaTech Tools v1.1.0
       </div>
     </aside>
   )
