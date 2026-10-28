@@ -3,19 +3,69 @@
 // there is no path from any input (whitelisted or otherwise) to shell
 // interpolation / command injection.
 
-import { execFile, spawn } from 'child_process'
+import { spawn } from 'child_process'
 import type { CommandExecutionResult } from '../../shared/types'
 import { logger } from './logger.service'
 
 const DEFAULT_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes, generous for DISM/winget
+const MAX_OUTPUT_BYTES = 1024 * 1024 * 32
 
 export interface RunOptions {
   timeoutMs?: number
   cwd?: string
+  /**
+   * Forward each output line to the log panel while the command runs. Used
+   * for long operations (SFC, DISM, winget install) so the technician sees
+   * progress instead of a silent spinner for several minutes.
+   */
+  stream?: boolean
+  /** Don't log the command itself (for internal background queries). */
+  quiet?: boolean
 }
 
 /**
- * Runs a command via execFile (no shell) and captures stdout/stderr.
+ * sfc.exe (and a few other system tools) write UTF-16LE when their output
+ * is redirected; everything else writes UTF-8/ANSI. Detect UTF-16 by the
+ * proportion of NUL bytes instead of trusting the console code page.
+ */
+// Bytes 0x80-0xFF of code page 850 (0xF0 is a soft hyphen and 0xFF a
+// no-break space, added by char code to keep the source free of invisible
+// characters).
+const CP850_HIGH =
+  'ÇüéâäàåçêëèïîìÄÅ' +
+  'ÉæÆôöòûùÿÖÜø£Ø×ƒ' +
+  'áíóúñÑªº¿®¬½¼¡«»' +
+  '░▒▓│┤ÁÂÀ©╣║╗╝¢¥┐' +
+  '└┴┬├─┼ãÃ╚╔╩╦╠═╬¤' +
+  'ðÐÊËÈıÍÎÏ┘┌█▄¦Ì▀' +
+  'ÓßÔÒõÕµþÞÚÛÙýÝ¯´' +
+  String.fromCharCode(0xad) +
+  '±‗¾¶§÷¸°¨·¹³²■' +
+  String.fromCharCode(0xa0)
+
+function decodeCp850(buffer: Buffer): string {
+  let out = ''
+  for (const byte of buffer)
+    out += byte < 0x80 ? String.fromCharCode(byte) : CP850_HIGH[byte - 0x80]
+  return out
+}
+
+function decodeOutput(buffer: Buffer): string {
+  if (buffer.length === 0) return ''
+  let nulCount = 0
+  const sample = Math.min(buffer.length, 512)
+  for (let i = 1; i < sample; i += 2) if (buffer[i] === 0) nulCount++
+  let text = nulCount > sample / 4 ? buffer.toString('utf16le') : buffer.toString('utf8')
+  // Console tools (ping, chkdsk, nslookup…) print in the OEM code page, so
+  // accented text isn't valid UTF-8 ("M�nimo"). Fall back to CP850, the OEM
+  // page of Spanish/Latin American Windows.
+  if (text.includes(String.fromCharCode(0xfffd))) text = decodeCp850(buffer)
+  const clean = text.split(String.fromCharCode(0)).join('')
+  return clean.charCodeAt(0) === 0xfeff ? clean.slice(1) : clean // strip BOM
+}
+
+/**
+ * Runs a command via spawn (no shell) and captures stdout/stderr.
  * `exe` and `args` must always come from a static whitelist entry or a
  * value that has already been validated (e.g. a winget id matched against
  * apps.json) — never directly from unvalidated renderer input.
@@ -26,35 +76,66 @@ export function runCaptured(
   options: RunOptions = {}
 ): Promise<CommandExecutionResult> {
   const commandLabel = [exe, ...args].join(' ')
-  logger.info(`Ejecutando: ${commandLabel}`)
+  if (!options.quiet) logger.info(`Ejecutando: ${commandLabel}`)
 
   return new Promise((resolve) => {
-    execFile(
-      exe,
-      args,
-      {
-        timeout: options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-        cwd: options.cwd,
-        windowsHide: true,
-        maxBuffer: 1024 * 1024 * 32
-      },
-      (error, stdout, stderr) => {
-        const exitCode = error && typeof error.code === 'number' ? error.code : error ? 1 : 0
-        const result: CommandExecutionResult = {
-          success: !error,
-          exitCode: error ? exitCode : 0,
-          stdout: stdout?.toString() ?? '',
-          stderr: stderr?.toString() ?? '',
-          command: commandLabel
+    const stdoutChunks: Buffer[] = []
+    const stderrChunks: Buffer[] = []
+    let outputBytes = 0
+    let timedOut = false
+    let lastStreamed = ''
+    let settled = false
+
+    const child = spawn(exe, args, { cwd: options.cwd, windowsHide: true, shell: false })
+
+    const timer = setTimeout(() => {
+      timedOut = true
+      child.kill()
+    }, options.timeoutMs ?? DEFAULT_TIMEOUT_MS)
+
+    const collect = (target: Buffer[]) => (chunk: Buffer) => {
+      if (outputBytes >= MAX_OUTPUT_BYTES) return
+      outputBytes += chunk.length
+      target.push(chunk)
+      if (options.stream) {
+        // Progress bars (SFC/DISM/winget) redraw the same line with \r, so
+        // split on both and skip blank lines and immediate repeats.
+        for (const raw of decodeOutput(chunk).split(/[\r\n]+/)) {
+          const line = raw.trim()
+          if (line.length < 2 || line === lastStreamed) continue
+          lastStreamed = line
+          logger.info(line)
         }
-        if (error) {
-          logger.error(`Fallo al ejecutar "${commandLabel}": ${error.message}`)
-        } else {
-          logger.success(`Comando completado: ${commandLabel}`)
-        }
-        resolve(result)
       }
-    )
+    }
+    child.stdout.on('data', collect(stdoutChunks))
+    child.stderr.on('data', collect(stderrChunks))
+
+    const finish = (exitCode: number | null, errorMessage?: string): void => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      const success = !errorMessage && !timedOut && exitCode === 0
+      const result: CommandExecutionResult = {
+        success,
+        exitCode,
+        stdout: decodeOutput(Buffer.concat(stdoutChunks)),
+        stderr: decodeOutput(Buffer.concat(stderrChunks)),
+        command: commandLabel
+      }
+      if (success) {
+        if (!options.quiet) logger.success(`Comando completado: ${commandLabel}`)
+      } else {
+        const reason =
+          errorMessage ?? (timedOut ? 'tiempo de espera agotado' : `código de salida ${exitCode}`)
+        if (!options.quiet) logger.error(`Fallo al ejecutar "${commandLabel}": ${reason}`)
+        if (!result.stderr && errorMessage) result.stderr = errorMessage
+      }
+      resolve(result)
+    }
+
+    child.once('error', (err) => finish(null, err.message))
+    child.once('close', (code) => finish(code))
   })
 }
 
@@ -66,6 +147,17 @@ function buildPsArgumentList(args: string[]): string {
   if (args.length === 0) return ''
   const quoted = args.map((a) => `'${escapePowerShellSingleQuoted(a)}'`).join(',')
   return `-ArgumentList ${quoted}`
+}
+
+/** Human explanation for the launch errors technicians actually hit. */
+function describeSpawnError(err: NodeJS.ErrnoException): string {
+  if (err.code === 'EPERM' || err.code === 'EACCES') {
+    return 'Windows o el antivirus bloqueó la ejecución (revisa el historial de protección de Windows Security).'
+  }
+  if (err.code === 'ENOENT') {
+    return 'El programa no está instalado o no se encontró en este equipo.'
+  }
+  return err.message
 }
 
 /**
@@ -93,7 +185,7 @@ export function openElevated(exe: string, args: string[]): Promise<void> {
     )
 
     child.once('error', (err) => {
-      logger.error(`No se pudo abrir "${exe}" elevado: ${err.message}`)
+      logger.error(`No se pudo abrir "${exe}" elevado: ${describeSpawnError(err)}`)
       reject(err)
     })
     child.once('spawn', () => {
@@ -109,7 +201,7 @@ export function openTool(exe: string, args: string[]): Promise<void> {
     logger.info(`Abriendo: ${exe} ${args.join(' ')}`)
     const child = spawn(exe, args, { detached: true, stdio: 'ignore', windowsHide: false })
     child.once('error', (err) => {
-      logger.error(`No se pudo abrir "${exe}": ${err.message}`)
+      logger.error(`No se pudo abrir "${exe}": ${describeSpawnError(err)}`)
       reject(err)
     })
     child.once('spawn', () => {

@@ -4,7 +4,9 @@ import type { OfficeInstallChoice } from '../../../shared/types'
 import { detectOffice, installOffice, openOfficeActivation } from '../../services/office.service'
 
 export function registerOfficeHandlers(): void {
-  ipcMain.handle(IpcChannels.officeDetect, () => detectOffice())
+  ipcMain.handle(IpcChannels.officeDetect, (_event, force?: unknown) =>
+    detectOffice(force === true)
+  )
   ipcMain.handle(IpcChannels.officeInstall, (_event, choice: OfficeInstallChoice) =>
     installOffice(choice)
   )

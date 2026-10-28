@@ -21,18 +21,18 @@ import { formatBytes, formatPercent } from '../lib/format'
 import type { WingetStatus, OfficeStatus, ActivationStatus } from '../../../shared/types'
 
 export function Home(): React.JSX.Element {
-  const { snapshot, loading, refresh } = useSystemStore()
+  const { snapshot, loading, refresh, ensureFresh } = useSystemStore()
   const { isElevated } = useAdminStore()
   const [winget, setWinget] = useState<WingetStatus | null>(null)
   const [office, setOffice] = useState<OfficeStatus | null>(null)
   const [activation, setActivation] = useState<ActivationStatus | null>(null)
 
   useEffect(() => {
-    refresh()
+    ensureFresh()
     window.api.programs.checkWinget().then(setWinget)
     window.api.office.detect().then(setOffice)
     window.api.activation.check().then(setActivation)
-  }, [refresh])
+  }, [ensureFresh])
 
   const disk = snapshot?.disks?.[0]
 

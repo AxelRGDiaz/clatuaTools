@@ -47,7 +47,13 @@ export function Maintenance(): React.JSX.Element {
                     {MAINTENANCE_LABELS[action].description}
                   </p>
                   {result && (
-                    <p className="mt-1 text-xs text-(--color-success)">
+                    <p
+                      className={
+                        result.success
+                          ? 'mt-1 text-xs text-(--color-success)'
+                          : 'mt-1 text-xs text-(--color-danger)'
+                      }
+                    >
                       {result.message}
                       {result.freedBytes !== undefined &&
                         result.freedBytes > 0 &&

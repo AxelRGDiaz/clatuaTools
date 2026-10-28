@@ -11,7 +11,7 @@ export function Activation(): React.JSX.Element {
 
   const load = async (): Promise<void> => {
     setLoading(true)
-    const result = await window.api.activation.check()
+    const result = await window.api.activation.check(true)
     setStatus(result)
     setLoading(false)
   }

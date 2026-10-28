@@ -32,7 +32,9 @@ async function runRepair(action: WindowsRepairAction): Promise<ActionResult> {
   const result = await window.api.windows.runRepair(action)
   return {
     success: result.success,
-    message: result.success ? 'Completado' : `Error (código ${result.exitCode ?? '?'})`
+    message: result.success
+      ? 'Completado'
+      : result.stderr.trim().split('\n')[0] || `Error (código ${result.exitCode ?? '?'})`
   }
 }
 

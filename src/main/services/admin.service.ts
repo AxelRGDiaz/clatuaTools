@@ -11,17 +11,22 @@ import { execFile, spawn } from 'child_process'
 import { isWindows } from '../security/platform'
 import { logger } from './logger.service'
 
+// A process' elevation can't change while it runs, so the check is done
+// once and shared by every caller (TopBar, snapshot, repair commands…).
+let elevatedPromise: Promise<boolean> | null = null
+
 export function isElevated(): Promise<boolean> {
   if (!isWindows) {
     // Dev/build host (macOS/Linux): never "elevated", but never blocks the UI either.
     return Promise.resolve(false)
   }
-  return new Promise((resolve) => {
+  elevatedPromise ??= new Promise((resolve) => {
     // `net session` only succeeds without error when run from an elevated process.
     execFile('net.exe', ['session'], { windowsHide: true, timeout: 5000 }, (error) => {
       resolve(!error)
     })
   })
+  return elevatedPromise
 }
 
 export function relaunchAsAdmin(): void {

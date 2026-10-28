@@ -34,6 +34,7 @@ const api = {
     list: () => ipcRenderer.invoke(IpcChannels.programsList),
     checkInstalled: (appId: string) =>
       ipcRenderer.invoke(IpcChannels.programsCheckInstalled, appId),
+    listInstalled: () => ipcRenderer.invoke(IpcChannels.programsListInstalled),
     installOne: (appId: string) => ipcRenderer.invoke(IpcChannels.programsInstallOne, appId),
     installBatch: (appIds: string[]) =>
       ipcRenderer.invoke(IpcChannels.programsInstallBatch, appIds),
@@ -57,12 +58,12 @@ const api = {
     run: (action: MaintenanceAction) => ipcRenderer.invoke(IpcChannels.maintenanceRun, action)
   },
   office: {
-    detect: () => ipcRenderer.invoke(IpcChannels.officeDetect),
+    detect: (force?: boolean) => ipcRenderer.invoke(IpcChannels.officeDetect, force),
     install: (choice: OfficeInstallChoice) => ipcRenderer.invoke(IpcChannels.officeInstall, choice),
     openActivation: () => ipcRenderer.invoke(IpcChannels.officeOpenActivation)
   },
   activation: {
-    check: () => ipcRenderer.invoke(IpcChannels.activationCheck),
+    check: (force?: boolean) => ipcRenderer.invoke(IpcChannels.activationCheck, force),
     openSettings: () => ipcRenderer.invoke(IpcChannels.activationOpenSettings),
     runDiagnostic: () => ipcRenderer.invoke(IpcChannels.activationRunDiagnostic)
   },
@@ -73,6 +74,7 @@ const api = {
   },
   logs: {
     save: (entries: LogEntry[]) => ipcRenderer.invoke(IpcChannels.logsSave, entries),
+    getAll: () => ipcRenderer.invoke(IpcChannels.logsGetAll),
     onEntry: (callback: (entry: LogEntry) => void) => {
       const listener = (_event: Electron.IpcRendererEvent, entry: LogEntry): void => callback(entry)
       ipcRenderer.on(IpcChannels.logsAppend, listener)

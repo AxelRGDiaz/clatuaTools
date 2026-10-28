@@ -22,13 +22,19 @@ export function Programs(): React.JSX.Element {
   const [messages, setMessages] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    window.api.programs.list().then((list) => {
+    window.api.programs.list().then(async (list: AppEntry[]) => {
       setApps(list)
-      list.forEach((app) => {
-        setStates((s) => ({ ...s, [app.id]: 'checking' }))
-        window.api.programs.checkInstalled(app.id).then((installed) => {
-          setStates((s) => ({ ...s, [app.id]: installed ? 'installed' : 'idle' }))
-        })
+      setStates(Object.fromEntries(list.map((app) => [app.id, 'checking' as InstallState])))
+      // Una sola consulta a winget para todo el catálogo (antes: un proceso
+      // `winget list` en paralelo por cada programa).
+      const installed = new Set<string>(await window.api.programs.listInstalled().catch(() => []))
+      setStates((s) => {
+        const next = { ...s }
+        for (const app of list) {
+          if (next[app.id] === 'checking')
+            next[app.id] = installed.has(app.id) ? 'installed' : 'idle'
+        }
+        return next
       })
     })
     window.api.programs.checkWinget().then(setWinget)

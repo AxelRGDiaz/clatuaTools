@@ -5,7 +5,8 @@ import {
   isAppInstalled,
   installApp,
   installBatch,
-  listApps
+  listApps,
+  listInstalledAppIds
 } from '../../services/winget.service'
 import type { InstallResult } from '../../../shared/types'
 
@@ -15,9 +16,10 @@ export function registerProgramsHandlers(): void {
   ipcMain.handle(IpcChannels.programsCheckInstalled, (_event, appId: string) =>
     isAppInstalled(appId)
   )
+  ipcMain.handle(IpcChannels.programsListInstalled, () => listInstalledAppIds())
   ipcMain.handle(IpcChannels.programsInstallOne, (_event, appId: string) => installApp(appId))
 
-  ipcMain.handle(IpcChannels.programsInstallBatch, async (event, appIds: string[]) => {
+  ipcMain.handle(IpcChannels.programsInstallBatch, async (event, appIds: unknown) => {
     const results: InstallResult[] = await installBatch(appIds, (result) => {
       event.sender.send(IpcChannels.programsInstallProgress, result)
     })

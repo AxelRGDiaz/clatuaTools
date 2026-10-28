@@ -3,13 +3,13 @@
 // enum value; it never controls the executable path or arguments.
 
 import type { QuickToolId } from '../../shared/types'
-import { QUICK_TOOL_COMMANDS } from '../security/commandWhitelist'
+import { QUICK_TOOL_COMMANDS, lookupSpec } from '../security/commandWhitelist'
 import { isWindows } from '../security/platform'
 import { openElevated, openTool } from './commandRunner.service'
 import { logger } from './logger.service'
 
 export async function openQuickTool(tool: QuickToolId): Promise<void> {
-  const spec = QUICK_TOOL_COMMANDS[tool]
+  const spec = lookupSpec(QUICK_TOOL_COMMANDS, tool)
   if (!spec) {
     logger.error(`Herramienta desconocida: ${tool}`)
     throw new Error(`Herramienta desconocida: ${tool}`)

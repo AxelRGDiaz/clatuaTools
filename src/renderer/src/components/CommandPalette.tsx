@@ -61,7 +61,8 @@ function PaletteDialog({ onClose }: { onClose: () => void }): React.JSX.Element 
             .getState()
             .run({ title: action.title, indeterminate: action.indeterminate }, () => action.run())
         } else {
-          void action.run()
+          // Los errores ya los registra el main en el panel de registro.
+          action.run().catch(() => {})
         }
       }
     }))

@@ -15,11 +15,33 @@ export function Office(): React.JSX.Element {
 
   useEffect(load, [])
 
+  const [installResult, setInstallResult] = useState<{ ok: boolean; text: string } | null>(null)
+
   const handleInstall = async (choice: OfficeInstallChoice): Promise<void> => {
     setInstalling(choice)
-    await window.api.office.install(choice)
-    setInstalling(null)
-    load()
+    setInstallResult(null)
+    try {
+      const result = await window.api.office.install(choice)
+      setInstallResult(
+        result.success
+          ? {
+              ok: true,
+              text:
+                choice === 'office-ltsc'
+                  ? 'Office Deployment Tool instalada. Sigue los pasos del panel de registro para completar Office LTSC.'
+                  : 'Instalación completada.'
+            }
+          : {
+              ok: false,
+              text:
+                result.stderr.trim().split('\n')[0] ||
+                `La instalación falló (código ${result.exitCode ?? '?'}).`
+            }
+      )
+    } finally {
+      setInstalling(null)
+      load()
+    }
   }
 
   return (
@@ -98,8 +120,21 @@ export function Office(): React.JSX.Element {
             Instalar Office LTSC
           </Button>
         </div>
+        {installResult && (
+          <p
+            className={
+              installResult.ok
+                ? 'mt-3 text-xs text-(--color-success)'
+                : 'mt-3 text-xs text-(--color-danger)'
+            }
+          >
+            {installResult.text}
+          </p>
+        )}
         <p className="mt-3 text-xs text-(--color-text-muted)">
-          Office LTSC requiere una licencia por volumen válida asociada a tu organización.
+          Office LTSC requiere una licencia por volumen válida asociada a tu organización. Se
+          instala la Office Deployment Tool oficial y se abre la Office Customization Tool de
+          Microsoft para generar la configuración.
         </p>
       </Card>
     </div>

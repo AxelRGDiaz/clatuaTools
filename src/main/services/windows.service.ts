@@ -3,7 +3,7 @@
 // the whole app instead of per-command RunAs (RunAs can't redirect output).
 
 import type { CommandExecutionResult, WindowsRepairAction } from '../../shared/types'
-import { WINDOWS_REPAIR_COMMANDS } from '../security/commandWhitelist'
+import { WINDOWS_REPAIR_COMMANDS, lookupSpec } from '../security/commandWhitelist'
 import { isElevated } from './admin.service'
 import { isWindows } from '../security/platform'
 import { runCaptured } from './commandRunner.service'
@@ -12,14 +12,14 @@ import { logger } from './logger.service'
 export async function runWindowsRepair(
   action: WindowsRepairAction
 ): Promise<CommandExecutionResult> {
-  const spec = WINDOWS_REPAIR_COMMANDS[action]
+  const spec = lookupSpec(WINDOWS_REPAIR_COMMANDS, action)
   if (!spec) {
     return {
       success: false,
       exitCode: null,
       stdout: '',
       stderr: 'Acción desconocida.',
-      command: action
+      command: String(action)
     }
   }
 
@@ -46,5 +46,5 @@ export async function runWindowsRepair(
     }
   }
 
-  return runCaptured(spec.exe, spec.args, { timeoutMs: 20 * 60 * 1000 })
+  return runCaptured(spec.exe, spec.args, { timeoutMs: 20 * 60 * 1000, stream: true })
 }

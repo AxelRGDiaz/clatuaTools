@@ -53,11 +53,9 @@ export const WINDOWS_REPAIR_COMMANDS: Record<WindowsRepairAction, CommandSpec> =
   }
 }
 
-// URL del script privado que ejecuta el botón "Herramientas de Sistema" del
-// menú lateral. Debe servirse por HTTPS desde un servidor que controles tú:
-// el whitelist garantiza que el renderer no puede cambiar este valor, pero
-// lo que haga el script depende de quién lo hospede.
-// TODO: reemplazar por la URL real.
+// URL del script privado que ejecuta el botón "Herrami// URL del script que ejecuta el botón "Herramientas de Sistema" del menú
+// lateral: WinUtil de Chris Titus (https://github.com/ChrisTitusTech/winutil).
+// El whitelist garantiza que el renderer no puede cambiar este valor.
 const SYSTEM_TOOLS_SCRIPT_URL = 'https://get.activated.win'
 
 export const QUICK_TOOL_COMMANDS: Record<QuickToolId, CommandSpec> = {
@@ -91,29 +89,29 @@ export const QUICK_TOOL_COMMANDS: Record<QuickToolId, CommandSpec> = {
     dangerous: false
   },
   services: {
-    exe: 'services.msc',
-    args: [],
+    exe: 'mmc.exe',
+    args: ['services.msc'],
     requiresAdmin: false,
     description: 'Abre el administrador de servicios de Windows.',
     dangerous: false
   },
   'device-manager': {
-    exe: 'devmgmt.msc',
-    args: [],
+    exe: 'mmc.exe',
+    args: ['devmgmt.msc'],
     requiresAdmin: false,
     description: 'Abre el Administrador de dispositivos.',
     dangerous: false
   },
   'disk-management': {
-    exe: 'diskmgmt.msc',
-    args: [],
+    exe: 'mmc.exe',
+    args: ['diskmgmt.msc'],
     requiresAdmin: false,
     description: 'Abre la Administración de discos.',
     dangerous: false
   },
   'event-viewer': {
-    exe: 'eventvwr.msc',
-    args: [],
+    exe: 'mmc.exe',
+    args: ['eventvwr.msc'],
     requiresAdmin: false,
     description: 'Abre el Visor de eventos.',
     dangerous: false
@@ -147,8 +145,8 @@ export const QUICK_TOOL_COMMANDS: Record<QuickToolId, CommandSpec> = {
     dangerous: false
   },
   'computer-management': {
-    exe: 'compmgmt.msc',
-    args: [],
+    exe: 'mmc.exe',
+    args: ['compmgmt.msc'],
     requiresAdmin: false,
     description: 'Abre Administración de equipos.',
     dangerous: false
@@ -202,11 +200,12 @@ export const QUICK_TOOL_COMMANDS: Record<QuickToolId, CommandSpec> = {
       '-ExecutionPolicy',
       'Bypass',
       '-Command',
-      `irm ${SYSTEM_TOOLS_SCRIPT_URL} | iex`
+      // PowerShell 5.1 no siempre negocia TLS 1.2 por defecto y la descarga falla.
+      `[Net.ServicePointManager]::SecurityProtocol = 'Tls12'; irm ${SYSTEM_TOOLS_SCRIPT_URL} | iex`
     ],
     requiresAdmin: true,
     description:
-      'Descarga y ejecuta el script privado de "Herramientas de Sistema" en una consola elevada. Requiere permisos de administrador.',
+      'Descarga y ejecuta WinUtil (utilidad de optimización de Chris Titus) en una consola elevada. Requiere permisos de administrador.',
     dangerous: true
   }
 }
@@ -264,4 +263,13 @@ export const WINGET_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9.\-_+]{1,127}$/
 
 export function isValidWingetId(id: string): boolean {
   return WINGET_ID_PATTERN.test(id)
+}
+
+/**
+ * Safe lookup into one of the tables above. IPC payloads are untyped at
+ * runtime, so a plain `TABLE[key]` would also resolve inherited keys like
+ * "constructor" or "__proto__"; only own entries are valid.
+ */
+export function lookupSpec<K extends string, V>(table: Record<K, V>, key: unknown): V | undefined {
+  return typeof key === 'string' && Object.hasOwn(table, key) ? table[key as K] : undefined
 }

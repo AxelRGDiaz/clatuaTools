@@ -7,15 +7,15 @@ import { useSystemStore } from '../store/systemStore'
 import type { CommandExecutionResult } from '../../../shared/types'
 
 export function Network(): React.JSX.Element {
-  const { snapshot, refresh } = useSystemStore()
+  const { snapshot, ensureFresh } = useSystemStore()
   const [host, setHost] = useState('8.8.8.8')
   const [pingResult, setPingResult] = useState<CommandExecutionResult | null>(null)
   const [dnsResult, setDnsResult] = useState<CommandExecutionResult | null>(null)
   const [busy, setBusy] = useState<'ping' | 'dns' | null>(null)
 
   useEffect(() => {
-    refresh()
-  }, [refresh])
+    ensureFresh()
+  }, [ensureFresh])
 
   const runPing = async (): Promise<void> => {
     setBusy('ping')

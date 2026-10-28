@@ -28,8 +28,8 @@ function sanitize(input: Partial<AppSettings>, base: AppSettings): AppSettings {
     uacBehavior:
       input.uacBehavior === 'silent-when-possible' ? 'silent-when-possible' : 'always-ask',
     logRetentionDays:
-      typeof input.logRetentionDays === 'number' && input.logRetentionDays > 0
-        ? input.logRetentionDays
+      typeof input.logRetentionDays === 'number' && input.logRetentionDays >= 1
+        ? Math.min(Math.round(input.logRetentionDays), 3650)
         : base.logRetentionDays
   }
 }

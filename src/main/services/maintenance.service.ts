@@ -8,7 +8,9 @@ import fs from 'fs/promises'
 import path from 'path'
 import os from 'os'
 import type { MaintenanceAction, MaintenanceActionResult } from '../../shared/types'
+import { MAINTENANCE_ACTIONS, lookupSpec } from '../security/commandWhitelist'
 import { isWindows } from '../security/platform'
+import { isElevated } from './admin.service'
 import { runCaptured, openTool } from './commandRunner.service'
 import { logger } from './logger.service'
 
@@ -108,10 +110,23 @@ async function cleanExplorerCache(): Promise<MaintenanceActionResult> {
   return { action: 'clean-explorer-cache', success: true, freedBytes, message }
 }
 
+async function isExplorerRunning(): Promise<boolean> {
+  const result = await runCaptured(
+    'tasklist.exe',
+    ['/FI', 'IMAGENAME eq explorer.exe', '/FO', 'CSV', '/NH'],
+    { quiet: true }
+  )
+  return /explorer\.exe/i.test(result.stdout)
+}
+
 async function restartExplorer(): Promise<MaintenanceActionResult> {
   logger.info('Reiniciando Windows Explorer…')
   await runCaptured('taskkill.exe', ['/F', '/IM', 'explorer.exe'])
-  await openTool('explorer.exe', [])
+  // Windows normally relaunches the shell by itself (AutoRestartShell).
+  // Starting explorer.exe while the shell is already back would just open
+  // an extra File Explorer window, so only start it if it didn't return.
+  await new Promise((resolve) => setTimeout(resolve, 2000))
+  if (!(await isExplorerRunning())) await openTool('explorer.exe', [])
   logger.success('Windows Explorer reiniciado.')
   return {
     action: 'restart-explorer',
@@ -132,8 +147,19 @@ async function openStartupApps(): Promise<MaintenanceActionResult> {
 export async function runMaintenanceAction(
   action: MaintenanceAction
 ): Promise<MaintenanceActionResult> {
+  if (!lookupSpec(MAINTENANCE_ACTIONS, action)) {
+    return { action, success: false, message: 'Acción de mantenimiento desconocida.' }
+  }
+
   if (!isWindows) {
     return { action, success: false, message: 'Esta acción solo está disponible en Windows.' }
+  }
+
+  if (MAINTENANCE_ACTIONS[action].requiresAdmin && !(await isElevated())) {
+    const message =
+      'Esta acción requiere privilegios de administrador. Reinicia ClatuaTech Tools como administrador e inténtalo de nuevo.'
+    logger.warning(message)
+    return { action, success: false, message }
   }
 
   switch (action) {

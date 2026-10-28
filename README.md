@@ -61,7 +61,8 @@ src/
 
 ## Requisitos
 
-- Node.js 20+
+- Node.js 22+ (npm 11+ respeta la lista `allowScripts` de `package.json`, que autoriza solo los
+  scripts de instalación de `electron`, `electron-winstaller` y `esbuild`)
 - Windows 10/11 para ejecutar las funciones específicas de Windows (winget, SFC/DISM, registro,
   etc.). El proyecto también compila y arranca en macOS/Linux para desarrollar la interfaz, pero
   los servicios que dependen de comandos de Windows devuelven datos vacíos/deshabilitados fuera de
@@ -81,11 +82,11 @@ el servidor de desarrollo; el proceso main y el preload se recompilan automátic
 
 ### Comandos útiles
 
-| Comando              | Qué hace                                                          |
-| --------------------- | ------------------------------------------------------------------ |
-| `npm run dev`          | Modo desarrollo con hot reload                                    |
-| `npm run lint`         | ESLint (incluye reglas de React Hooks y Prettier)                 |
-| `npm run format`       | Formatea todo el proyecto con Prettier                            |
+| Comando                | Qué hace                                                           |
+| ---------------------- | ------------------------------------------------------------------ |
+| `npm run dev`          | Modo desarrollo con hot reload                                     |
+| `npm run lint`         | ESLint (incluye reglas de React Hooks y Prettier)                  |
+| `npm run format`       | Formatea todo el proyecto con Prettier                             |
 | `npm run typecheck`    | `tsc --noEmit` para main/preload y para el renderer                |
 | `npm run build`        | Typecheck + build de producción (main, preload, renderer) a `out/` |
 | `npm run build:win`    | Build de producción + empaquetado NSIS para Windows (`.exe`)       |
@@ -111,10 +112,10 @@ runner `windows-latest` (sin necesitar Windows en local):
 
 - **En cada push a `main`** y en cada PR: instala dependencias, ejecuta `lint` + `typecheck` +
   `build:win`, y sube el `.exe` resultante como artefacto descargable de la ejecución del workflow
-  (pestaña *Actions* → la ejecución → *Artifacts*).
+  (pestaña _Actions_ → la ejecución → _Artifacts_).
 - **Al hacer push de un tag `vX.Y.Z`** (por ejemplo `git tag v1.0.0 && git push origin v1.0.0`):
   además de lo anterior, crea automáticamente una GitHub Release con el `.exe` adjunto.
-- También se puede lanzar manualmente desde *Actions → Build Windows installer → Run workflow*.
+- También se puede lanzar manualmente desde _Actions → Build Windows installer → Run workflow_.
 
 El instalador generado no está firmado digitalmente, así que Windows SmartScreen puede mostrar una
 advertencia la primera vez que se ejecute en un equipo — es el comportamiento esperado sin un
@@ -144,7 +145,8 @@ versionada en el futuro sin cambiar la interfaz.
 - La instalación de Office usa el id de paquete de winget para Microsoft 365/Office; la activación
   siempre se hace iniciando sesión con una cuenta/licencia válida dentro de Office, nunca mediante
   esta aplicación.
-- `npm audit` reporta un aviso de severidad alta en `extract-zip` (dependencia transitiva del
-  paquete `electron` usada solo para descargar el binario de Electron durante `postinstall`, no se
-  incluye en la app empaquetada). Solucionarlo implica saltar a Electron 44; queda pendiente de
-  decisión antes de actualizar una dependencia mayor.
+- Electron 45: `npm audit` sin vulnerabilidades. Desde Electron 45 el binario ya no se descarga
+  en `npm install`, sino la primera vez que se ejecuta `npm run dev`/`start` (o con
+  `npx install-electron`).
+- El repositorio fuerza finales de línea LF (`.gitattributes`) para que Prettier/ESLint den el
+  mismo resultado en Windows que en macOS/Linux.

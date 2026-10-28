@@ -26,4 +26,12 @@ export function initLogSubscription(): void {
   window.api.logs.onEntry((entry) => {
     useLogStore.getState().addEntry(entry)
   })
+  // Recupera lo registrado antes de que existiera la ventana (arranque,
+  // comprobación de administrador…), sin duplicar lo que ya llegó en vivo.
+  window.api.logs.getAll().then((history: LogEntry[]) => {
+    useLogStore.setState((state) => {
+      const seen = new Set(state.entries.map((e) => e.id))
+      return { entries: [...history.filter((e) => !seen.has(e.id)), ...state.entries].slice(-2000) }
+    })
+  })
 }

@@ -19,7 +19,10 @@ export function Drivers(): React.JSX.Element {
         title="Dispositivos con problemas"
         icon={<Cpu size={16} />}
         action={
-          <Button variant="secondary" onClick={() => window.api.drivers.openDeviceManager()}>
+          <Button
+            variant="secondary"
+            onClick={() => window.api.drivers.openDeviceManager().catch(() => {})}
+          >
             Administrador de dispositivos
           </Button>
         }

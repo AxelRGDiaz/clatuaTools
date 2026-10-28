@@ -10,6 +10,7 @@ import driverLinksConfig from '../config/driverLinks.json'
 
 const PROBLEM_DEVICES_SCRIPT = `
 $ErrorActionPreference = 'SilentlyContinue'
+[Console]::OutputEncoding = [Text.Encoding]::UTF8
 Get-CimInstance Win32_PnPEntity | Where-Object { $_.ConfigManagerErrorCode -ne 0 } | ForEach-Object {
   [PSCustomObject]@{
     Name = $_.Name
@@ -24,12 +25,12 @@ Get-CimInstance Win32_PnPEntity | Where-Object { $_.ConfigManagerErrorCode -ne 0
 export async function listDriverProblems(): Promise<DriverProblem[]> {
   if (!isWindows) return []
 
-  const result = await runCaptured('powershell.exe', [
-    '-NoProfile',
-    '-NonInteractive',
-    '-Command',
-    PROBLEM_DEVICES_SCRIPT
-  ])
+  logger.info('Buscando dispositivos con problemas de drivers…')
+  const result = await runCaptured(
+    'powershell.exe',
+    ['-NoProfile', '-NonInteractive', '-Command', PROBLEM_DEVICES_SCRIPT],
+    { quiet: true }
+  )
   if (!result.success || !result.stdout.trim()) return []
 
   let parsed: unknown
@@ -57,5 +58,5 @@ export function getVendorLinks(): VendorLink[] {
 
 export function openDeviceManager(): Promise<void> {
   logger.info('Abriendo el Administrador de dispositivos…')
-  return openTool('devmgmt.msc', [])
+  return openTool('mmc.exe', ['devmgmt.msc'])
 }

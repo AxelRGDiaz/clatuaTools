@@ -136,7 +136,7 @@ function buildReportHtml(
 }
 
 export function Report(): React.JSX.Element {
-  const { snapshot, refresh } = useSystemStore()
+  const { snapshot, ensureFresh } = useSystemStore()
   const entries = useLogStore((s) => s.entries)
   const [technician, setTechnician] = useState('')
   const [notes, setNotes] = useState('')
@@ -146,10 +146,10 @@ export function Report(): React.JSX.Element {
   const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null)
 
   useEffect(() => {
-    refresh()
+    ensureFresh()
     window.api.activation.check().then(setActivation)
     window.api.office.detect().then(setOffice)
-  }, [refresh])
+  }, [ensureFresh])
 
   const handleExport = async (): Promise<void> => {
     setExporting(true)

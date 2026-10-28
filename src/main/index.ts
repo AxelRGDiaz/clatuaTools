@@ -26,7 +26,9 @@ function createWindow(): BrowserWindow {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      // The preload only uses contextBridge/ipcRenderer, so it runs fine
+      // inside Chromium's sandbox.
+      sandbox: true
     }
   })
 

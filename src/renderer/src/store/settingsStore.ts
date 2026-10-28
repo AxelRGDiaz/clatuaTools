@@ -5,7 +5,8 @@ interface SettingsState {
   settings: AppSettings | null
   loading: boolean
   load: () => Promise<void>
-  update: (partial: Partial<AppSettings>) => Promise<void>
+  // Devuelve la configuración tal como quedó guardada (ya saneada por el main).
+  update: (partial: Partial<AppSettings>) => Promise<AppSettings>
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -22,6 +23,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const settings = await window.api.settings.set(partial)
     set({ settings })
     if (!current || current.theme !== settings.theme) applyTheme(settings.theme)
+    return settings
   }
 }))
 

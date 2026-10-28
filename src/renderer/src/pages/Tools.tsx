@@ -33,7 +33,8 @@ export function Tools(): React.JSX.Element {
             <Button
               key={tool}
               variant="secondary"
-              onClick={() => window.api.windows.openTool(tool)}
+              // El error ya queda en el panel de registro (lo escribe el main).
+              onClick={() => window.api.windows.openTool(tool).catch(() => {})}
             >
               {QUICK_TOOL_LABELS[tool]}
             </Button>

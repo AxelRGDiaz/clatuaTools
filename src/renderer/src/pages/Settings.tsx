@@ -1,7 +1,47 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { SettingsIcon } from 'lucide-react'
 import { Card } from '../components/Card'
 import { useSettingsStore } from '../store/settingsStore'
+
+// Campo de texto que guarda al salir del campo o con Enter, no en cada
+// tecla: así no se escribe settings.json por cada carácter y el saneado del
+// main (que recorta espacios y rechaza valores vacíos) no pelea con lo que
+// el usuario está tecleando.
+function DraftInput({
+  value,
+  onCommit,
+  ...props
+}: {
+  value: string
+  // Guarda y devuelve el valor que quedó almacenado tras el saneado.
+  onCommit: (value: string) => Promise<string>
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>): React.JSX.Element {
+  const [draft, setDraft] = useState(value)
+  const [lastValue, setLastValue] = useState(value)
+  if (value !== lastValue) {
+    // El valor guardado cambió (o el main lo saneó): reflejarlo.
+    setLastValue(value)
+    setDraft(value)
+  }
+
+  const commit = async (): Promise<void> => {
+    if (draft === value) return
+    // Si el main rechaza o recorta el valor, mostrar lo que realmente quedó.
+    setDraft(await onCommit(draft))
+  }
+
+  return (
+    <input
+      {...props}
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.currentTarget.blur()
+      }}
+    />
+  )
+}
 
 function Toggle({
   checked,
@@ -48,9 +88,9 @@ export function Settings(): React.JSX.Element {
           <label className="mb-1 block text-xs font-medium text-(--color-text-secondary)">
             Nombre de la aplicación
           </label>
-          <input
+          <DraftInput
             value={settings.appName}
-            onChange={(e) => update({ appName: e.target.value })}
+            onCommit={async (v) => (await update({ appName: v })).appName}
             className="w-full max-w-sm rounded-lg border border-(--color-surface-border) bg-(--color-surface-2) px-3 py-2 text-sm text-(--color-text-primary) outline-none focus:border-(--color-accent)"
           />
         </div>
@@ -104,11 +144,13 @@ export function Settings(): React.JSX.Element {
         <label className="mb-1 block text-xs font-medium text-(--color-text-secondary)">
           Retención de logs (días)
         </label>
-        <input
+        <DraftInput
           type="number"
           min={1}
-          value={settings.logRetentionDays}
-          onChange={(e) => update({ logRetentionDays: Number(e.target.value) })}
+          value={String(settings.logRetentionDays)}
+          onCommit={async (v) =>
+            String((await update({ logRetentionDays: Number(v) })).logRetentionDays)
+          }
           className="w-32 rounded-lg border border-(--color-surface-border) bg-(--color-surface-2) px-3 py-2 text-sm text-(--color-text-primary) outline-none focus:border-(--color-accent)"
         />
       </Card>

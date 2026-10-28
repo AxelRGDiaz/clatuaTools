@@ -15,11 +15,11 @@ function Row({ label, value }: { label: string; value: string | number }): React
 }
 
 export function Diagnostics(): React.JSX.Element {
-  const { snapshot, loading, refresh } = useSystemStore()
+  const { snapshot, loading, refresh, ensureFresh } = useSystemStore()
 
   useEffect(() => {
-    refresh()
-  }, [refresh])
+    ensureFresh()
+  }, [ensureFresh])
 
   return (
     <div className="flex flex-col gap-4">

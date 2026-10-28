@@ -38,6 +38,7 @@ export const IpcChannels = {
   wingetCheck: 'winget:check',
   programsList: 'programs:list',
   programsCheckInstalled: 'programs:checkInstalled',
+  programsListInstalled: 'programs:listInstalled',
   programsInstallOne: 'programs:installOne',
   programsInstallBatch: 'programs:installBatch',
   programsInstallProgress: 'programs:installProgress', // main -> renderer event
@@ -67,6 +68,7 @@ export const IpcChannels = {
   // logs
   logsAppend: 'logs:append', // main -> renderer event
   logsSave: 'logs:save',
+  logsGetAll: 'logs:getAll',
 
   // settings
   settingsGet: 'settings:get',
@@ -91,6 +93,7 @@ export interface IpcApi {
   [IpcChannels.wingetCheck]: { args: []; result: WingetStatus }
   [IpcChannels.programsList]: { args: []; result: AppEntry[] }
   [IpcChannels.programsCheckInstalled]: { args: [appId: string]; result: boolean }
+  [IpcChannels.programsListInstalled]: { args: []; result: string[] }
   [IpcChannels.programsInstallOne]: { args: [appId: string]; result: InstallResult }
   [IpcChannels.programsInstallBatch]: { args: [appIds: string[]]; result: InstallResult[] }
 
@@ -105,14 +108,14 @@ export interface IpcApi {
     result: MaintenanceActionResult
   }
 
-  [IpcChannels.officeDetect]: { args: []; result: OfficeStatus }
+  [IpcChannels.officeDetect]: { args: [force?: boolean]; result: OfficeStatus }
   [IpcChannels.officeInstall]: {
     args: [choice: OfficeInstallChoice]
     result: CommandExecutionResult
   }
   [IpcChannels.officeOpenActivation]: { args: []; result: void }
 
-  [IpcChannels.activationCheck]: { args: []; result: ActivationStatus }
+  [IpcChannels.activationCheck]: { args: [force?: boolean]; result: ActivationStatus }
   [IpcChannels.activationOpenSettings]: { args: []; result: void }
   [IpcChannels.activationRunDiagnostic]: { args: []; result: CommandExecutionResult }
 
@@ -121,6 +124,7 @@ export interface IpcApi {
   [IpcChannels.driversOpenDeviceManager]: { args: []; result: void }
 
   [IpcChannels.logsSave]: { args: [entries: LogEntry[]]; result: string }
+  [IpcChannels.logsGetAll]: { args: []; result: LogEntry[] }
 
   [IpcChannels.settingsGet]: { args: []; result: AppSettings }
   [IpcChannels.settingsSet]: { args: [settings: Partial<AppSettings>]; result: AppSettings }
